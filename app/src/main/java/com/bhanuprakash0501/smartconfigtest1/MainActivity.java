@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,10 +16,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.espressif.iot.esptouch.EsptouchTask;
-import com.espressif.iot.esptouch.IEsptouchListener;
 import com.espressif.iot.esptouch.IEsptouchResult;
 import com.espressif.iot.esptouch.util.ByteUtil;
 import com.espressif.iot.esptouch.util.TouchNetUtil;
@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     String password;
     String wifi_details[];
     private MActivityAsyncTask4 mTask;
+    Button button;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +47,25 @@ public class MainActivity extends AppCompatActivity {
             String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
             requestPermissions(permissions, REQUEST_PERMISSION);
         }
+        button = findViewById(R.id.button);
+
         ssid = "Bhanu";
         password = "prakash0501";
         Log.i("SSID", ssid);
         wifi_details = getWifiDetails(this);
         ssid = wifi_details[0];
         bssid = wifi_details[1];
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+                buttonMethod();
+            }
+        });
     }
 
 
 
-    public void button() {
+    public void buttonMethod() {
             Log.i("SSID", ssid);
             Log.i("BSSID", bssid);
             mTask = new MActivityAsyncTask4(this);
@@ -144,13 +154,15 @@ public class MainActivity extends AppCompatActivity {
             Log.i("BackgroundTask", "yes");
             int taskResultCount= 1;
             MainActivity activity = mActivity.get();
-            Context context = activity.getApplicationContext();
-            apSsid = bytes[0];
-            apBssid = bytes[1];
-            apPassword = bytes[2];
-            task = new EsptouchTask(apSsid, apBssid, apPassword, context);
-            task.setPackageBroadcast(false);
-            return task.executeForResults(taskResultCount);
+            synchronized (mLock) {
+                Context context = activity.getApplicationContext();
+                apSsid = bytes[0];
+                apBssid = bytes[1];
+                apPassword = bytes[2];
+                task = new EsptouchTask(apSsid, apBssid, apPassword, context);
+                task.setPackageBroadcast(true);
+                return task.executeForResults(taskResultCount);
+            }
         }
     }
 
