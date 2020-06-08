@@ -1,0 +1,2 @@
+rootProject.name='smartconfigtest1'
+include ':app', ':esptouch'
