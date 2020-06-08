@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         ssid = wifi_details[0];
         bssid = wifi_details[1];
         button.setOnClickListener(new View.OnClickListener() {
+            
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
                 buttonMethod();
